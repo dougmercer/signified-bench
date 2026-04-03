@@ -1,0 +1,47 @@
+[project]
+name = "signified-bench"
+version = "0.1.1"
+description = "Benchmarks and performance scoring for signified"
+readme = "README.md"
+authors = [
+    { name = "Doug Mercer", email = "dougmerceryt@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "signified",
+    "pyperf>=2.10.0",
+    "pytest>=8.4.0",
+    "pytest-benchmark>=5.1.0",
+]
+
+[project.scripts]
+signified-bench = "signified_bench.run:main"
+signified-bench-score = "signified_bench.score:main"
+
+[project.optional-dependencies]
+compare = [
+    "param>=2.3.3",
+    "reaktiv>=0.19.1",
+    "signals>=0.1.0a5",
+]
+
+[dependency-groups]
+test = [
+    "pytest>=8.4.0",
+]
+
+[tool.uv.sources]
+signified = { path = "../signified", editable = true }
+
+[build-system]
+requires = ["uv_build>=0.10.0,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+addopts = '-m "not benchmark"'
+markers = [
+    "benchmark: performance-focused tests and microbench harnesses",
+]
+testpaths = [
+    "tests",
+]
