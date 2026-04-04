@@ -1,38 +1,41 @@
 # signified-bench
 
-Benchmarking and performance-scoring tools for `signified`.
+Cross-library compare benchmarks for `signified`.
 
-This repo keeps the benchmark harness separate from the main library while still
-targeting a sibling checkout at `../signified` by default. The CLI's table-mode
-pytest entrypoints live inside the package so `uv run --with ../signified-bench`
-works both from a checkout and from an installed wheel.
+The signified-only CodSpeed benchmarks now live in the main `signified`
+repository. This repo keeps only the reusable compare harness so you can run
+portable scenarios against `signified` and other reactive libraries from a
+separate checkout.
 
 ## Layout
 
-- `src/signified_bench/` contains the reusable benchmark package.
-- `tests/` contains pytest benchmark entrypoints, score tests, and heavier stress checks.
+- `src/signified_bench/` contains the compare package and CLI.
+- `tests/` contains compare-suite pytest entrypoints and CLI tests.
 
 ## Common commands
 
 ```bash
-uv sync --group test --group bench
+uv sync --group test
 uv run signified-bench --list
-uv run signified-bench --group steady-state --fast
+uv run signified-bench --table --codspeed
+uv run signified-bench --table --codspeed --scenario shared_clock_reads
 uv run pytest
 ```
 
-To run the cross-library compare suite against `signified`, `reaktiv`,
-`signals`, and `param`:
+From a local `signified` checkout, layer this repo in just like CI does:
 
 ```bash
-uv sync --group test --group compare
-uv run signified-bench --suite compare --list
-uv run signified-bench --table --suite compare --backend signified --backend reaktiv
-uv run signified-bench --table --suite compare --scenario shared_clock_reads
+uv run --with-editable ../signified-bench --with-editable . signified-bench --table --codspeed
 ```
 
-To score two `pytest-benchmark` JSON outputs:
+To run the compare suite against `signified` and `reaktiv`:
 
 ```bash
-uv run signified-bench-score current.json --baseline baseline.json
+uv sync --group test --extra compare
+uv run signified-bench --list
+uv run signified-bench --table --codspeed --backend signified --backend reaktiv
+uv run signified-bench --table --codspeed --scenario shared_clock_reads
 ```
+
+Compare mode is the default CLI behavior, so `--compare` is optional and kept
+only as a readability alias.

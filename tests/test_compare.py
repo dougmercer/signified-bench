@@ -53,13 +53,13 @@ def test_get_compare_scenarios_exposes_both_groups() -> None:
 
 
 def test_get_compare_backends_can_filter_by_name() -> None:
-    backends = get_compare_backends(["signified", "param"])
+    backends = get_compare_backends(["signified", "reaktiv"])
 
-    assert [backend.name for backend in backends] == ["signified", "param"]
+    assert [backend.name for backend in backends] == ["signified", "reaktiv"]
 
 
 def test_compare_registry_contains_requested_backends_and_scenarios() -> None:
-    assert {"signified", "reaktiv", "signals", "param"} <= set(COMPARE_BACKENDS_BY_NAME)
+    assert {"signified", "reaktiv"} <= set(COMPARE_BACKENDS_BY_NAME)
     assert {"signal_read_write", "shared_clock_reads", "build_diamond_graph"} <= set(COMPARE_SCENARIOS_BY_NAME)
 
 

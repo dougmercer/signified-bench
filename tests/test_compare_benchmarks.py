@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import importlib.util
-
 import pytest
 
+from signified_bench._benchmarking import BENCHMARK_TOOLING_ERROR, has_pytest_benchmark_tooling
 from signified_bench.compare import (
     COMPARE_BACKENDS,
     COMPARE_CONSTRUCTION_SCENARIOS,
@@ -14,16 +13,15 @@ from signified_bench.compare import (
     CompareScenarioSpec,
 )
 
-HAS_PYTEST_BENCHMARK = importlib.util.find_spec("pytest_benchmark") is not None
 BENCHMARK_MARK = pytest.mark.skipif(
-    not HAS_PYTEST_BENCHMARK,
-    reason="Install benchmark tooling with `uv sync` first.",
+    not has_pytest_benchmark_tooling(),
+    reason=BENCHMARK_TOOLING_ERROR,
 )
 
 
 def _make_backend_or_skip(spec: CompareBackendSpec):
     if not spec.is_available():
-        pytest.skip(f"{spec.name} is not installed. Run `uv sync --group compare` first.")
+        pytest.skip(f"{spec.name} is not installed. Run `uv sync --extra compare` first.")
     try:
         return spec.make_backend()
     except RuntimeError as exc:
@@ -31,7 +29,7 @@ def _make_backend_or_skip(spec: CompareBackendSpec):
 
 
 @BENCHMARK_MARK
-@pytest.mark.benchmark(disable_gc=True, min_rounds=12, warmup=True, warmup_iterations=1)
+@pytest.mark.benchmark
 @pytest.mark.parametrize("backend_spec", COMPARE_BACKENDS, ids=[spec.name for spec in COMPARE_BACKENDS])
 @pytest.mark.parametrize(
     "scenario_spec",
@@ -44,11 +42,11 @@ def test_compare_steady_state_scenarios(benchmark, backend_spec: CompareBackendS
     runner = scenario_spec.make_runner(backend)
     benchmark.extra_info["backend"] = backend_spec.name
     benchmark.extra_info["description"] = scenario_spec.description
-    benchmark(runner)
+    benchmark.pedantic(runner, rounds=12, warmup_rounds=1)
 
 
 @BENCHMARK_MARK
-@pytest.mark.benchmark(disable_gc=True, min_rounds=8, warmup=True, warmup_iterations=1)
+@pytest.mark.benchmark
 @pytest.mark.parametrize("backend_spec", COMPARE_BACKENDS, ids=[spec.name for spec in COMPARE_BACKENDS])
 @pytest.mark.parametrize(
     "scenario_spec",
@@ -61,4 +59,4 @@ def test_compare_construction_scenarios(benchmark, backend_spec: CompareBackendS
     runner = scenario_spec.make_runner(backend)
     benchmark.extra_info["backend"] = backend_spec.name
     benchmark.extra_info["description"] = scenario_spec.description
-    benchmark(runner)
+    benchmark.pedantic(runner, rounds=8, warmup_rounds=1)

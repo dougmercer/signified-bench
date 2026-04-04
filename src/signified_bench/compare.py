@@ -1,9 +1,4 @@
-"""Portable cross-library reactive benchmarks.
-
-This module defines a second benchmark suite that compares ``signified`` against
-other Python reactive libraries using only scenarios that can be expressed with
-comparable semantics across backends.
-"""
+"""Portable cross-library compare benchmarks for ``signified``."""
 
 from __future__ import annotations
 
@@ -130,79 +125,6 @@ class _ReaktivBackend(_BaseBackend):
 
     def _resolve(self, dep: Any) -> Any:
         return self.get(dep) if isinstance(dep, ReactiveNode) else dep
-
-
-class _SignalsBackend(_BaseBackend):
-    name = "signals"
-
-    def __init__(self) -> None:
-        super().__init__()
-        module = importlib.import_module("signals")
-        self._signal_type = module.Signal
-        self._computed_factory = getattr(module, "computed", None)
-        self._computed_type = getattr(module, "Computed", None)
-        self._effect_factory = getattr(module, "effect")
-        if self._computed_factory is None and self._computed_type is None:
-            raise RuntimeError("The installed `signals` package does not expose a computed primitive.")
-
-    def signal(self, value: Any) -> ReactiveNode:
-        return ReactiveNode(self._signal_type(value))
-
-    def computed(self, func: Callable[..., Any], *deps: Any) -> ReactiveNode:
-        compute = lambda: func(*(self._resolve(dep) for dep in deps))
-        if self._computed_factory is not None:
-            return ReactiveNode(self._computed_factory(compute))
-        return ReactiveNode(self._computed_type(compute))
-
-    def effect(self, func: Callable[..., None], *deps: Any) -> object:
-        handle = self._effect_factory(lambda: func(*(self._resolve(dep) for dep in deps)))
-        return self._remember_effect(handle)
-
-    def get(self, node: ReactiveNode) -> Any:
-        handle = node.handle
-        if hasattr(handle, "value"):
-            return handle.value
-        return handle()
-
-    def set(self, node: ReactiveNode, value: Any) -> None:
-        handle = node.handle
-        if hasattr(handle, "set"):
-            handle.set(value)
-            return
-        handle.value = value
-
-    def _resolve(self, dep: Any) -> Any:
-        return self.get(dep) if isinstance(dep, ReactiveNode) else dep
-
-
-class _ParamBackend(_BaseBackend):
-    name = "param"
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._param = importlib.import_module("param")
-        self._rx = self._param.rx
-
-    def signal(self, value: Any) -> ReactiveNode:
-        return ReactiveNode(self._rx(value))
-
-    def computed(self, func: Callable[..., Any], *deps: Any) -> ReactiveNode:
-        bound = self._param.bind(func, *(self._unwrap(dep) for dep in deps))
-        return ReactiveNode(bound.rx())
-
-    def effect(self, func: Callable[..., None], *deps: Any) -> object:
-        bound = self._param.bind(func, *(self._unwrap(dep) for dep in deps), watch=True)
-        bound()
-        return self._remember_effect(bound)
-
-    def get(self, node: ReactiveNode) -> Any:
-        return node.handle.rx.value
-
-    def set(self, node: ReactiveNode, value: Any) -> None:
-        node.handle.rx.value = value
-
-    def _unwrap(self, dep: Any) -> Any:
-        return dep.handle if isinstance(dep, ReactiveNode) else dep
 
 
 def make_signal_read_write_runner(backend: ReactiveBackend, batch_size: int = 8_000) -> ScenarioRunner:
@@ -535,18 +457,6 @@ COMPARE_BACKENDS: Final[tuple[CompareBackendSpec, ...]] = (
         description="Signal/Computed/Effect API with lazy automatic dependency tracking.",
         make_backend=_ReaktivBackend,
     ),
-    # CompareBackendSpec(
-    #     name="signals",
-    #     module_name="signals",
-    #     description="Transparent reactive programming primitives inspired by JS signals.",
-    #     make_backend=_SignalsBackend,
-    # ),  # unreleased
-    # CompareBackendSpec(
-    #     name="param",
-    #     module_name="param",
-    #     description="Param reactive expressions and bound reactive functions.",
-    #     make_backend=_ParamBackend,
-    # ),  # it's so slow. Just skip it.
 )
 COMPARE_BACKENDS_BY_NAME: Final[dict[str, CompareBackendSpec]] = {
     backend.name: backend for backend in COMPARE_BACKENDS
