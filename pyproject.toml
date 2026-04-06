@@ -1,6 +1,6 @@
 [project]
 name = "signified-bench"
-version = "0.1.1"
+version = "0.1.2"
 description = "Cross-library compare benchmarks for signified"
 readme = "README.md"
 authors = [
@@ -8,7 +8,6 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "signified",
     "pytest>=8.4.0",
     "pytest-benchmark>=5.1.0",
     "pytest-codspeed>=4.3.0",
@@ -19,8 +18,12 @@ signified-bench = "signified_bench.run:main"
 
 [project.optional-dependencies]
 compare = [
+    "param>=2.3.3",
     "reaktiv>=0.19.1",
+    "signals>=0.1.0a7",
 ]
+# Run signified-bench via uv run --with signified-bench, and assume that signified
+# is already in your environment
 
 [dependency-groups]
 test = [

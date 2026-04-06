@@ -108,6 +108,15 @@ wheels = [
 ]
 
 [[package]]
+name = "param"
+version = "2.3.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/64/30f7fa7fd5ba7337ba6e746fbf7a963800229430c663ab82b09821d9a8c3/param-2.3.3.tar.gz", hash = "sha256:43c24345d287d4abda15eac65b5b15d55f178a393421f0bfca02a77dd6c0d1dd", size = 202196, upload-time = "2026-03-31T16:09:47.982Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ea/2b/4bc14b04ae260e68c4db7d1e5d2fdda214fb4381236fc8e2d720ed14e2d9/param-2.3.3-py3-none-any.whl", hash = "sha256:ae25afbc372c1a5e4ee72935cc76ff77b1db1c4eb092bc46715c906ef3cc2e69", size = 139996, upload-time = "2026-03-31T16:09:45.845Z" },
+]
+
+[[package]]
 name = "pluggy"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -217,12 +226,12 @@ wheels = [
 ]
 
 [[package]]
-name = "signified"
-version = "0.3.2"
+name = "signals"
+version = "0.1.0a7"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c2/59/2ccc373fa9c6f917a31b0eeb676aef0b68ff041d74cff91722c13215e637/signified-0.3.2.tar.gz", hash = "sha256:82e7de2ccbe2481c39fe6a288642081a04c300ac89bbdacef21c9168e9c2e72a", size = 30674, upload-time = "2026-03-07T22:40:05.453Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/36/cc07dbb15f361a5a4b63045079a4bc756aef37c61eddd229423b8ff69b90/signals-0.1.0a7.tar.gz", hash = "sha256:0a3d0c0408ba3b91364ebf13704ff10b5ea80737e7b033a42a6f0717fa67ff1c", size = 127162, upload-time = "2026-04-01T14:48:45.271Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/f5/7420da50e7ed45656aa3315ffc5da1c022919eb4da75484eae8d7e6974c4/signified-0.3.2-py3-none-any.whl", hash = "sha256:3889ffb63f11922728cef14d28d241aa4745a048933a8cce8ce9d9617afbbada", size = 25335, upload-time = "2026-03-07T22:40:04.322Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/49/f021726b3c4473e75d586e843b47d99841882abaf9853e525dab94abed77/signals-0.1.0a7-py3-none-any.whl", hash = "sha256:39516ec66c003177a5107ea2088fb4ddab6b95d504c3f4de50a9de8e4caec3c2", size = 19998, upload-time = "2026-04-01T14:48:44.042Z" },
 ]
 
 [[package]]
@@ -233,12 +242,13 @@ dependencies = [
     { name = "pytest" },
     { name = "pytest-benchmark" },
     { name = "pytest-codspeed" },
-    { name = "signified" },
 ]
 
 [package.optional-dependencies]
 compare = [
+    { name = "param" },
     { name = "reaktiv" },
+    { name = "signals" },
 ]
 
 [package.dev-dependencies]
@@ -248,11 +258,12 @@ test = [
 
 [package.metadata]
 requires-dist = [
+    { name = "param", marker = "extra == 'compare'", specifier = ">=2.3.3" },
     { name = "pytest", specifier = ">=8.4.0" },
     { name = "pytest-benchmark", specifier = ">=5.1.0" },
     { name = "pytest-codspeed", specifier = ">=4.3.0" },
     { name = "reaktiv", marker = "extra == 'compare'", specifier = ">=0.19.1" },
-    { name = "signified" },
+    { name = "signals", marker = "extra == 'compare'", specifier = ">=0.1.0a7" },
 ]
 provides-extras = ["compare"]
 
